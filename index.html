@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR"> 
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Framework Interativo de Precificação MCMV</title>
-  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide-react@0.264.0/dist/umd/lucide-react.min.js"></script>
+  <title>Framework de Precificação MCMV</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
       margin: 0;
@@ -94,6 +91,9 @@
       white-space: nowrap;
       cursor: pointer;
       transition: all 0.2s ease;
+      border: none;
+      background-color: #f3f4f6;
+      color: #6b7280;
     }
     
     .step-button.active {
@@ -105,11 +105,6 @@
     .step-button.completed {
       background-color: #dcfce7;
       color: #166534;
-    }
-    
-    .step-button.inactive {
-      background-color: #f3f4f6;
-      color: #6b7280;
     }
     
     .content-container {
@@ -157,16 +152,6 @@
     .info-box.purple {
       background-color: #ede9fe;
       color: #5b21b6;
-    }
-    
-    .info-box.indigo {
-      background-color: #e0e7ff;
-      color: #3730a3;
-    }
-    
-    .info-box.orange {
-      background-color: #ffedd5;
-      color: #9a3412;
     }
     
     .info-box-content h4 {
@@ -422,19 +407,19 @@
       height: 20px;
     }
     
-    .text-green-600 {
+    .text-green {
       color: #16a34a;
     }
     
-    .text-red-600 {
+    .text-red {
       color: #dc2626;
     }
     
-    .text-blue-600 {
+    .text-blue {
       color: #2563eb;
     }
     
-    .text-yellow-600 {
+    .text-yellow {
       color: #ca8a04;
     }
     
@@ -482,6 +467,19 @@
       margin-top: 24px;
     }
     
+    .text-center {
+      text-align: center;
+    }
+    
+    .py-8 {
+      padding-top: 32px;
+      padding-bottom: 32px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
     @media (max-width: 768px) {
       .grid-2,
       .grid-3,
@@ -496,19 +494,13 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="app"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-    const { 
-      ChevronRight, ChevronLeft, Calculator, TrendingUp, Users, MapPin, 
-      DollarSign, Target, BarChart3, CheckCircle, AlertTriangle, Info 
-    } = LucideReact;
-    
-    const MCMVPricingFramework = () => {
-      const [currentStep, setCurrentStep] = useState(0);
-      const [formData, setFormData] = useState({
-        // Análise de Demanda
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Estados da aplicação
+      let currentStep = 0;
+      let formData = {
         populacaoTotal: '',
         taxaCrescimento: '',
         migracaoInterna: '',
@@ -516,75 +508,37 @@
         familiasFaixa2: '',
         familiasFaixa3: '',
         deficitHabitacional: '',
-        
-        // Análise Competitiva
         concorrentes: [],
-        
-        // Análise Financeira
         custoTerreno: '',
         custoConstrucao: '',
         custosIndiretos: '',
         margemDesejada: '',
-        
-        // Pesquisa de Mercado
         precoIdeal: '',
         precoMaximo: '',
         precoSuspeito: '',
-        
-        // Estratégia
         estrategia: '',
         vsoMeta: ''
-      });
-
-      const [results, setResults] = useState({
+      };
+      
+      let results = {
         som: 0,
         precoMinimo: 0,
         precoSugerido: 0,
         vsoProjetada: 0,
         margemFinal: 0
-      });
-
+      };
+      
       const steps = [
-        {
-          id: 'demanda',
-          title: 'Análise de Demanda',
-          icon: Users,
-          description: 'Calcular TAM/SAM/SOM do mercado'
-        },
-        {
-          id: 'competitiva',
-          title: 'Análise Competitiva',
-          icon: TrendingUp,
-          description: 'Mapear concorrência e posicionamento'
-        },
-        {
-          id: 'financeira',
-          title: 'Análise Financeira',
-          icon: Calculator,
-          description: 'Calcular custos e margem mínima'
-        },
-        {
-          id: 'pesquisa',
-          title: 'Pesquisa de Mercado',
-          icon: Target,
-          description: 'Validar intenção de compra'
-        },
-        {
-          id: 'estrategia',
-          title: 'Estratégia de Preço',
-          icon: DollarSign,
-          description: 'Definir abordagem de precificação'
-        },
-        {
-          id: 'resultados',
-          title: 'Resultados',
-          icon: BarChart3,
-          description: 'Análise final e recomendações'
-        }
+        { id: 'demanda', title: 'Análise de Demanda', icon: 'users', description: 'Calcular TAM/SAM/SOM do mercado' },
+        { id: 'competitiva', title: 'Análise Competitiva', icon: 'chart-line', description: 'Mapear concorrência e posicionamento' },
+        { id: 'financeira', title: 'Análise Financeira', icon: 'calculator', description: 'Calcular custos e margem mínima' },
+        { id: 'pesquisa', title: 'Pesquisa de Mercado', icon: 'bullseye', description: 'Validar intenção de compra' },
+        { id: 'estrategia', title: 'Estratégia de Preço', icon: 'dollar-sign', description: 'Definir abordagem de precificação' },
+        { id: 'resultados', title: 'Resultados', icon: 'bar-chart', description: 'Análise final e recomendações' }
       ];
-
-      const updateFormData = (field, value) => {
-        // Garante que valores numéricos não sejam negativos
+      
+      // Funções utilitárias
+      function updateFormData(field, value) {
         const numericFields = [
           'populacaoTotal', 'taxaCrescimento', 'migracaoInterna', 'familiasFaixa1',
           'familiasFaixa2', 'familiasFaixa3', 'deficitHabitacional', 'custoTerreno',
@@ -594,921 +548,911 @@
         
         if (numericFields.includes(field)) {
           const numValue = parseFloat(value);
-          if (!isNaN(numValue) {
-            // Se for um número, garante que não seja negativo
-            setFormData(prev => ({ ...prev, [field]: Math.max(0, numValue).toString() }));
-            return;
+          if (!isNaN(numValue)) {
+            formData[field] = Math.max(0, numValue).toString();
+          } else {
+            formData[field] = value;
           }
+        } else {
+          formData[field] = value;
         }
-        setFormData(prev => ({ ...prev, [field]: value }));
-      };
-
-      const addConcorrente = () => {
-        const newConcorrente = {
+        calculateResults();
+        render();
+      }
+      
+      function addConcorrente() {
+        formData.concorrentes.push({
           nome: '',
           preco: '',
           metragem: '',
           localizacao: '',
           diferencial: '',
           vso: ''
-        };
-        setFormData(prev => ({
-          ...prev,
-          concorrentes: [...prev.concorrentes, newConcorrente]
-        }));
-      };
-
-      const updateConcorrente = (index, field, value) => {
-        const newConcorrentes = [...formData.concorrentes];
-        
-        // Garante que valores numéricos não sejam negativos
+        });
+        render();
+      }
+      
+      function updateConcorrente(index, field, value) {
         const numericFields = ['preco', 'metragem', 'vso'];
         if (numericFields.includes(field)) {
           const numValue = parseFloat(value);
           if (!isNaN(numValue)) {
-            newConcorrentes[index][field] = Math.max(0, numValue).toString();
+            formData.concorrentes[index][field] = Math.max(0, numValue).toString();
           } else {
-            newConcorrentes[index][field] = value;
+            formData.concorrentes[index][field] = value;
           }
         } else {
-          newConcorrentes[index][field] = value;
+          formData.concorrentes[index][field] = value;
         }
-        
-        setFormData(prev => ({ ...prev, concorrentes: newConcorrentes }));
-      };
-
-      const removeConcorrente = (index) => {
-        setFormData(prev => ({
-          ...prev,
-          concorrentes: prev.concorrentes.filter((_, i) => i !== index)
-        }));
-      };
-
-      const calculateResults = () => {
+        render();
+      }
+      
+      function removeConcorrente(index) {
+        formData.concorrentes = formData.concorrentes.filter((_, i) => i !== index);
+        render();
+      }
+      
+      function calculateResults() {
         const populacao = parseFloat(formData.populacaoTotal) || 0;
-        const numFamilias = populacao / 3.2;
         const familiasFaixa = (parseFloat(formData.familiasFaixa1) || 0) + 
                              (parseFloat(formData.familiasFaixa2) || 0) + 
                              (parseFloat(formData.familiasFaixa3) || 0);
         
         // SOM Calculation
-        const som = (familiasFaixa * 0.3 * 0.15) / 24; // 30% elegíveis, 15% penetração, 24 meses
+        results.som = Math.round((familiasFaixa * 0.3 * 0.15) / 24);
         
         // Preço Mínimo
         const custoTotal = (parseFloat(formData.custoTerreno) || 0) + 
                           (parseFloat(formData.custoConstrucao) || 0) + 
                           (parseFloat(formData.custosIndiretos) || 0);
         const margemMin = parseFloat(formData.margemDesejada) || 25;
-        const precoMinimo = custoTotal * (1 + margemMin/100) * 1.1; // 10% margem segurança
+        results.precoMinimo = Math.round(custoTotal * (1 + margemMin/100) * 1.1);
         
         // Preço Sugerido baseado na estratégia
-        let precoSugerido = precoMinimo;
+        let precoSugerido = results.precoMinimo;
         const precoMedio = formData.concorrentes.reduce((acc, comp) => 
           acc + (parseFloat(comp.preco) || 0), 0) / (formData.concorrentes.length || 1);
         
         switch(formData.estrategia) {
           case 'valor':
-            precoSugerido = Math.max(precoMinimo, precoMedio * 1.1);
+            precoSugerido = Math.max(results.precoMinimo, precoMedio * 1.1);
             break;
           case 'competitiva':
-            precoSugerido = Math.max(precoMinimo, precoMedio);
+            precoSugerido = Math.max(results.precoMinimo, precoMedio);
             break;
           case 'penetracao':
-            precoSugerido = Math.max(precoMinimo, precoMedio * 0.95);
+            precoSugerido = Math.max(results.precoMinimo, precoMedio * 0.95);
             break;
           default:
-            precoSugerido = precoMinimo;
+            precoSugerido = results.precoMinimo;
         }
+        
+        results.precoSugerido = Math.round(precoSugerido);
         
         // VSO Projetada
         const vsoBase = parseFloat(formData.vsoMeta) || 2.5;
-        const ajustePreco = precoSugerido < precoMedio ? 1.3 : (precoSugerido > precoMedio * 1.1 ? 0.8 : 1);
-        const vsoProjetada = vsoBase * ajustePreco;
+        const ajustePreco = results.precoSugerido < precoMedio ? 1.3 : 
+                           (results.precoSugerido > precoMedio * 1.1 ? 0.8 : 1);
+        results.vsoProjetada = parseFloat((vsoBase * ajustePreco).toFixed(2));
         
         // Margem Final
-        const margemFinal = ((precoSugerido - custoTotal) / precoSugerido) * 100;
-        
-        setResults({
-          som: Math.round(som),
-          precoMinimo: Math.round(precoMinimo),
-          precoSugerido: Math.round(precoSugerido),
-          vsoProjetada: parseFloat(vsoProjetada.toFixed(2)),
-          margemFinal: parseFloat(margemFinal.toFixed(1))
-        });
-      };
-
-      useEffect(() => {
-        calculateResults();
-      }, [formData]);
-
-      const renderStep = () => {
-        switch(steps[currentStep].id) {
-          case 'demanda':
-            return (
-              <div className="space-y-6">
-                <div className="info-box blue">
-                  <div className="flex-center">
-                    <Info className="icon" />
-                    <div>
-                      <h4 className="font-medium">Dados Demográficos</h4>
-                      <p className="text-sm">Colete dados do IBGE, Receita Federal e órgãos locais</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid-2">
-                  <div className="input-group">
-                    <label>População Total da Cidade</label>
-                    <input
-                      type="number"
-                      value={formData.populacaoTotal}
-                      onChange={(e) => updateFormData('populacaoTotal', e.target.value)}
-                      placeholder="Ex: 150000"
-                      min="0"
-                    />
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Taxa Crescimento Anual (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={formData.taxaCrescimento}
-                      onChange={(e) => updateFormData('taxaCrescimento', e.target.value)}
-                      placeholder="Ex: 2.5"
-                      min="0"
-                    />
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Migração Interna (pessoas/ano)</label>
-                    <input
-                      type="number"
-                      value={formData.migracaoInterna}
-                      onChange={(e) => updateFormData('migracaoInterna', e.target.value)}
-                      placeholder="Ex: 2000"
-                      min="0"
-                    />
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Déficit Habitacional (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={formData.deficitHabitacional}
-                      onChange={(e) => updateFormData('deficitHabitacional', e.target.value)}
-                      placeholder="Ex: 12.5"
-                      min="0"
-                    />
-                  </div>
-                </div>
-                
-                <div className="summary-box">
-                  <h4 className="font-medium mb-3">Distribuição de Famílias MCMV</h4>
-                  <div className="grid-3">
-                    <div className="input-group">
-                      <label className="text-sm">Faixa 1 (até R$ 2.640)</label>
-                      <input
-                        type="number"
-                        value={formData.familiasFaixa1}
-                        onChange={(e) => updateFormData('familiasFaixa1', e.target.value)}
-                        placeholder="Nº famílias"
-                        min="0"
-                      />
-                    </div>
-                    <div className="input-group">
-                      <label className="text-sm">Faixa 2 (R$ 2.640-4.400)</label>
-                      <input
-                        type="number"
-                        value={formData.familiasFaixa2}
-                        onChange={(e) => updateFormData('familiasFaixa2', e.target.value)}
-                        placeholder="Nº famílias"
-                        min="0"
-                      />
-                    </div>
-                    <div className="input-group">
-                      <label className="text-sm">Faixa 3 (R$ 4.400-8.000)</label>
-                      <input
-                        type="number"
-                        value={formData.familiasFaixa3}
-                        onChange={(e) => updateFormData('familiasFaixa3', e.target.value)}
-                        placeholder="Nº famílias"
-                        min="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                {formData.populacaoTotal && (
-                  <div className="info-box green">
-                    <h4 className="font-medium mb-2">Indicadores Calculados</h4>
-                    <div className="grid-2">
-                      <div>
-                        <span>Número estimado de famílias:</span>
-                        <span className="font-medium ml-2">{Math.round(parseFloat(formData.populacaoTotal) / 3.2).toLocaleString()}</span>
-                      </div>
-                      <div>
-                        <span>SOM estimado (24 meses):</span>
-                        <span className="font-medium ml-2 text-green-600">{results.som} unidades</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-            
-          case 'competitiva':
-            return (
-              <div className="space-y-6">
-                <div className="info-box yellow">
-                  <div className="flex-center">
-                    <Info className="icon" />
-                    <div>
-                      <h4 className="font-medium">Análise Competitiva</h4>
-                      <p className="text-sm">Mapeie empreendimentos similares lançados nos últimos 2 anos</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium">Concorrentes Mapeados</h3>
-                  <button
-                    onClick={addConcorrente}
-                    className="button primary"
-                  >
-                    + Adicionar Concorrente
-                  </button>
-                </div>
-                
-                <div className="space-y-4">
-                  {formData.concorrentes.map((concorrente, index) => (
-                    <div key={index} className="competitor-card">
-                      <div className="competitor-header">
-                        <h4>Concorrente {index + 1}</h4>
-                        <button
-                          onClick={() => removeConcorrente(index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          Remover
-                        </button>
-                      </div>
-                      
-                      <div className="grid-3">
-                        <div className="input-group">
-                          <label className="text-sm font-medium">Nome do Empreendimento</label>
-                          <input
-                            type="text"
-                            value={concorrente.nome}
-                            onChange={(e) => updateConcorrente(index, 'nome', e.target.value)}
-                            placeholder="Ex: Residencial Aurora"
-                          />
-                        </div>
-                        
-                        <div className="input-group">
-                          <label className="text-sm font-medium">Preço (R$)</label>
-                          <input
-                            type="number"
-                            value={concorrente.preco}
-                            onChange={(e) => updateConcorrente(index, 'preco', e.target.value)}
-                            placeholder="Ex: 190000"
-                            min="0"
-                          />
-                        </div>
-                        
-                        <div className="input-group">
-                          <label className="text-sm font-medium">Metragem (m²)</label>
-                          <input
-                            type="number"
-                            value={concorrente.metragem}
-                            onChange={(e) => updateConcorrente(index, 'metragem', e.target.value)}
-                            placeholder="Ex: 45"
-                            min="0"
-                          />
-                        </div>
-                        
-                        <div className="input-group">
-                          <label className="text-sm font-medium">Localização</label>
-                          <input
-                            type="text"
-                            value={concorrente.localizacao}
-                            onChange={(e) => updateConcorrente(index, 'localizacao', e.target.value)}
-                            placeholder="Ex: Bairro Centro"
-                          />
-                        </div>
-                        
-                        <div className="input-group">
-                          <label className="text-sm font-medium">Principal Diferencial</label>
-                          <input
-                            type="text"
-                            value={concorrente.diferencial}
-                            onChange={(e) => updateConcorrente(index, 'diferencial', e.target.value)}
-                            placeholder="Ex: Academia, Piscina"
-                          />
-                        </div>
-                        
-                        <div className="input-group">
-                          <label className="text-sm font-medium">VSO (un/mês)</label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            value={concorrente.vso}
-                            onChange={(e) => updateConcorrente(index, 'vso', e.target.value)}
-                            placeholder="Ex: 25"
-                            min="0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {formData.concorrentes.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>Adicione concorrentes para análise comparativa</p>
-                    </div>
-                  )}
-                </div>
-                
-                {formData.concorrentes.length > 0 && (
-                  <div className="info-box blue">
-                    <h4 className="font-medium mb-2">Resumo Competitivo</h4>
-                    <div className="grid-3">
-                      <div>
-                        <span>Preço médio:</span>
-                        <span className="font-medium ml-2">
-                          R$ {(formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.preco) || 0), 0) / formData.concorrentes.length).toLocaleString('pt-BR')}
-                        </span>
-                      </div>
-                      <div>
-                        <span>Metragem média:</span>
-                        <span className="font-medium ml-2">
-                          {(formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.metragem) || 0), 0) / formData.concorrentes.length).toFixed(0)}m²
-                        </span>
-                      </div>
-                      <div>
-                        <span>VSO médio:</span>
-                        <span className="font-medium ml-2">
-                          {(formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.vso) || 0), 0) / formData.concorrentes.length).toFixed(1)} un/mês
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-            
-          case 'financeira':
-            return (
-              <div className="space-y-6">
-                <div className="info-box green">
-                  <div className="flex-center">
-                    <Info className="icon" />
-                    <div>
-                      <h4 className="font-medium">Estrutura de Custos</h4>
-                      <p className="text-sm">Calcule todos os custos para definir o preço mínimo viável</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid-2">
-                  <div className="input-group">
-                    <label>Custo do Terreno (R$/m² construído)</label>
-                    <input
-                      type="number"
-                      value={formData.custoTerreno}
-                      onChange={(e) => updateFormData('custoTerreno', e.target.value)}
-                      placeholder="Ex: 250"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Incluir custo de oportunidade e despesas cartoriais</p>
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Custo de Construção (R$/m²)</label>
-                    <input
-                      type="number"
-                      value={formData.custoConstrucao}
-                      onChange={(e) => updateFormData('custoConstrucao', e.target.value)}
-                      placeholder="Ex: 1200"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">CUB + margem de segurança de obras</p>
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Custos Indiretos (R$/m²)</label>
-                    <input
-                      type="number"
-                      value={formData.custosIndiretos}
-                      onChange={(e) => updateFormData('custosIndiretos', e.target.value)}
-                      placeholder="Ex: 200"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Projetos, aprovações, marketing, vendas, administração</p>
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Margem Desejada (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={formData.margemDesejada}
-                      onChange={(e) => updateFormData('margemDesejada', e.target.value)}
-                      placeholder="Ex: 25"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Margem líquida após impostos e financeiro</p>
-                  </div>
-                </div>
-                
-                {formData.custoTerreno && formData.custoConstrucao && (
-                  <div className="summary-box">
-                    <h4 className="font-medium mb-3">Análise de Custos</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Custo Total Direto:</span>
-                        <span className="font-medium">
-                          R$ {((parseFloat(formData.custoTerreno) || 0) + 
-                               (parseFloat(formData.custoConstrucao) || 0) + 
-                               (parseFloat(formData.custosIndiretos) || 0)).toLocaleString('pt-BR')}/m²
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-red-600">
-                        <span>Preço Mínimo (com margem):</span>
-                        <span className="font-medium">R$ {results.precoMinimo.toLocaleString('pt-BR')}/m²</span>
-                      </div>
-                      <div className="flex justify-between text-yellow-600">
-                        <span>Margem de Segurança:</span>
-                        <span className="font-medium">10% sobre margem desejada</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="info-box yellow">
-                  <h4 className="font-medium mb-2">⚠️ Pontos de Atenção</h4>
-                  <ul className="text-sm space-y-1">
-                    <li>• Considere variação do CUB durante a obra (+5-10%)</li>
-                    <li>• Reserve capital de giro para 6-12 meses</li>
-                    <li>• Avalie impacto de distratos na margem final</li>
-                    <li>• Custos financeiros do cronograma de recebimento</li>
-                  </ul>
+        results.margemFinal = parseFloat((((results.precoSugerido - custoTotal) / results.precoSugerido) * 100).toFixed(1));
+      }
+      
+      // Funções de renderização
+      function renderStep() {
+        const step = steps[currentStep].id;
+        if (step === 'demanda') return renderDemanda();
+        if (step === 'competitiva') return renderCompetitiva();
+        if (step === 'financeira') return renderFinanceira();
+        if (step === 'pesquisa') return renderPesquisa();
+        if (step === 'estrategia') return renderEstrategia();
+        if (step === 'resultados') return renderResultados();
+        return '<div>Etapa não encontrada</div>';
+      }
+      
+      function renderDemanda() {
+        return `
+          <div class="space-y-6">
+            <div class="info-box blue">
+              <div class="flex-center">
+                <i class="fas fa-info-circle icon"></i>
+                <div>
+                  <h4 class="font-medium">Dados Demográficos</h4>
+                  <p class="text-sm">Colete dados do IBGE, Receita Federal e órgãos locais</p>
                 </div>
               </div>
-            );
+            </div>
             
-          case 'pesquisa':
-            return (
-              <div className="space-y-6">
-                <div className="info-box purple">
-                  <div className="flex-center">
-                    <Info className="icon" />
-                    <div>
-                      <h4 className="font-medium">Pesquisa de Intenção de Compra</h4>
-                      <p className="text-sm">Valide a sensibilidade ao preço do público-alvo</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="info-box blue">
-                  <h4 className="font-medium mb-2">📋 Como Conduzir a Pesquisa</h4>
-                  <div className="text-sm space-y-2">
-                    <p><strong>Pergunta-chave:</strong> "Para uma família com renda de R$ X, qual seria o valor máximo que pagaria por um apartamento de XXm² no bairro Y, considerando financiamento MCMV?"</p>
-                    <p><strong>Canais sugeridos:</strong> Stands de vendas, redes sociais, pesquisa telefônica, eventos imobiliários</p>
-                    <p><strong>Amostra mínima:</strong> 200+ pessoas da faixa de renda MCMV</p>
-                  </div>
-                </div>
-                
-                <div className="grid-3">
-                  <div className="input-group">
-                    <label>Preço Ideal (R$)</label>
-                    <input
-                      type="number"
-                      value={formData.precoIdeal}
-                      onChange={(e) => updateFormData('precoIdeal', e.target.value)}
-                      placeholder="Ex: 180000"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Preço mais citado na pesquisa</p>
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Preço Máximo Aceitável (R$)</label>
-                    <input
-                      type="number"
-                      value={formData.precoMaximo}
-                      onChange={(e) => updateFormData('precoMaximo', e.target.value)}
-                      placeholder="Ex: 220000"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Limite superior de aceitação</p>
-                  </div>
-                  
-                  <div className="input-group">
-                    <label>Preço Suspeito (R$)</label>
-                    <input
-                      type="number"
-                      value={formData.precoSuspeito}
-                      onChange={(e) => updateFormData('precoSuspeito', e.target.value)}
-                      placeholder="Ex: 150000"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Preço considerado "muito barato"</p>
-                  </div>
-                </div>
-                
-                {formData.precoIdeal && formData.precoMaximo && (
-                  <div className="info-box green">
-                    <h4 className="font-medium mb-2">Análise de Sensibilidade</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Faixa de Preço Aceitável:</span>
-                        <span className="font-medium">
-                          R$ {parseFloat(formData.precoIdeal).toLocaleString('pt-BR')} - R$ {parseFloat(formData.precoMaximo).toLocaleString('pt-BR')}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Elasticidade Estimada:</span>
-                        <span className="font-medium">
-                          {(((parseFloat(formData.precoMaximo) - parseFloat(formData.precoIdeal)) / parseFloat(formData.precoIdeal) * 100).toFixed(1)}% de variação
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Sweet Spot Recomendado:</span>
-                        <span className="font-medium text-green-600">
-                          R$ {((parseFloat(formData.precoIdeal) + parseFloat(formData.precoMaximo)) / 2).toLocaleString('pt-BR')}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="info-box orange">
-                  <h4 className="font-medium mb-2">🎯 Dicas para Validação</h4>
-                  <ul className="text-sm space-y-1">
-                    <li>• Compare resultados com análise competitiva</li>
-                    <li>• Teste diferentes perfis de renda na mesma pesquisa</li>
-                    <li>• Valide diferencial de preço por localização</li>
-                    <li>• Considere sazonalidade na pesquisa (evitar dezembro/janeiro)</li>
-                  </ul>
-                </div>
+            <div class="grid-2">
+              <div class="input-group">
+                <label>População Total da Cidade</label>
+                <input
+                  type="number"
+                  value="${formData.populacaoTotal}"
+                  onchange="updateFormData('populacaoTotal', this.value)"
+                  placeholder="Ex: 150000"
+                  min="0"
+                />
               </div>
-            );
+              
+              <div class="input-group">
+                <label>Taxa Crescimento Anual (%)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value="${formData.taxaCrescimento}"
+                  onchange="updateFormData('taxaCrescimento', this.value)"
+                  placeholder="Ex: 2.5"
+                  min="0"
+                />
+              </div>
+              
+              <div class="input-group">
+                <label>Migração Interna (pessoas/ano)</label>
+                <input
+                  type="number"
+                  value="${formData.migracaoInterna}"
+                  onchange="updateFormData('migracaoInterna', this.value)"
+                  placeholder="Ex: 2000"
+                  min="0"
+                />
+              </div>
+              
+              <div class="input-group">
+                <label>Déficit Habitacional (%)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value="${formData.deficitHabitacional}"
+                  onchange="updateFormData('deficitHabitacional', this.value)"
+                  placeholder="Ex: 12.5"
+                  min="0"
+                />
+              </div>
+            </div>
             
-          case 'estrategia':
-            return (
-              <div className="space-y-6">
-                <div className="info-box indigo">
-                  <div className="flex-center">
-                    <Info className="icon" />
-                    <div>
-                      <h4 className="font-medium">Estratégia de Precificação</h4>
-                      <p className="text-sm">Escolha a abordagem mais adequada para seu projeto</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="strategy-option">
-                    <label className="flex items-start">
-                      <input
-                        type="radio"
-                        name="estrategia"
-                        value="valor"
-                        checked={formData.estrategia === 'valor'}
-                        onChange={(e) => updateFormData('estrategia', e.target.value)}
-                      />
-                      <div className="strategy-option-content green">
-                        <h4>Precificação por Valor</h4>
-                        <p>Preço baseado no valor percebido pelos clientes. Ideal quando você tem diferenciais únicos e superiores à concorrência.</p>
-                        <div className="text-green-600">
-                          <strong>Quando usar:</strong> Localização premium, acabamentos superiores, infraestrutura diferenciada
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                  
-                  <div className="strategy-option">
-                    <label className="flex items-start">
-                      <input
-                        type="radio"
-                        name="estrategia"
-                        value="competitiva"
-                        checked={formData.estrategia === 'competitiva'}
-                        onChange={(e) => updateFormData('estrategia', e.target.value)}
-                      />
-                      <div className="strategy-option-content blue">
-                        <h4>Precificação Competitiva</h4>
-                        <p>Preço similar ao mercado, competindo em outros fatores como prazo de entrega, facilidade de aprovação ou atendimento.</p>
-                        <div className="text-blue-600">
-                          <strong>Quando usar:</strong> Mercado estabelecido, produto similar aos concorrentes, foco na execução
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                  
-                  <div className="strategy-option">
-                    <label className="flex items-start">
-                      <input
-                        type="radio"
-                        name="estrategia"
-                        value="penetracao"
-                        checked={formData.estrategia === 'penetracao'}
-                        onChange={(e) => updateFormData('estrategia', e.target.value)}
-                      />
-                      <div className="strategy-option-content orange">
-                        <h4>Precificação de Penetração</h4>
-                        <p>Preço abaixo do mercado para ganhar participação rapidamente. Estratégia de volume com margem reduzida.</p>
-                        <div className="text-orange-600">
-                          <strong>Quando usar:</strong> Entrada em novo mercado, necessidade de VSO alta, concorrência forte
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-                
-                <div className="input-group">
-                  <label>Meta de VSO (% estoque/mês)</label>
+            <div class="summary-box">
+              <h4 class="font-medium mb-3">Distribuição de Famílias MCMV</h4>
+              <div class="grid-3">
+                <div class="input-group">
+                  <label class="text-sm">Faixa 1 (até R$ 2.640)</label>
                   <input
                     type="number"
-                    step="0.1"
-                    value={formData.vsoMeta}
-                    onChange={(e) => updateFormData('vsoMeta', e.target.value)}
-                    placeholder="Ex: 2.5"
+                    value="${formData.familiasFaixa1}"
+                    onchange="updateFormData('familiasFaixa1', this.value)"
+                    placeholder="Nº famílias"
                     min="0"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Referência: Mercado normal 2-3%, aquecido 3-5%, fraco 1-2%
-                  </p>
                 </div>
-                
-                {formData.estrategia && (
-                  <div className="summary-box">
-                    <h4 className="font-medium mb-2">Impactos da Estratégia Escolhida</h4>
-                    <div className="text-sm space-y-1">
-                      {formData.estrategia === 'valor' && (
-                        <>
-                          <p className="text-green-600">✓ Maior margem de lucro</p>
-                          <p className="text-green-600">✓ Posicionamento premium</p>
-                          <p className="text-red-600">⚠ VSO mais baixa</p>
-                          <p className="text-red-600">⚠ Risco de estoque parado</p>
-                        </>
-                      )}
-                      {formData.estrategia === 'competitiva' && (
-                        <>
-                          <p className="text-blue-600">✓ Risco equilibrado</p>
-                          <p className="text-blue-600">✓ VSO previsível</p>
-                          <p className="text-yellow-600">⚠ Margem média</p>
-                          <p className="text-yellow-600">⚠ Dependente da execução</p>
-                        </>
-                      )}
-                      {formData.estrategia === 'penetracao' && (
-                        <>
-                          <p className="text-orange-600">✓ VSO alta</p>
-                          <p className="text-orange-600">✓ Rápida penetração</p>
-                          <p className="text-red-600">⚠ Margem reduzida</p>
-                          <p className="text-red-600">⚠ Pode prejudicar brand</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-            
-          case 'resultados':
-            return (
-              <div className="space-y-6">
-                <div className="result-highlight">
-                  <h4 className="font-bold">📊 Análise Final e Recomendações</h4>
+                <div class="input-group">
+                  <label class="text-sm">Faixa 2 (R$ 2.640-4.400)</label>
+                  <input
+                    type="number"
+                    value="${formData.familiasFaixa2}"
+                    onchange="updateFormData('familiasFaixa2', this.value)"
+                    placeholder="Nº famílias"
+                    min="0"
+                  />
                 </div>
-                
-                <div className="grid-2">
-                  <div className="result-card">
-                    <h4 className="font-medium mb-3">Indicadores de Demanda</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>SOM (24 meses):</span>
-                        <span className="font-medium">{results.som} unidades</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Famílias elegíveis:</span>
-                        <span className="font-medium">
-                          {((parseFloat(formData.familiasFaixa1) || 0) + 
-                            (parseFloat(formData.familiasFaixa2) || 0) + 
-                            (parseFloat(formData.familiasFaixa3) || 0)).toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="result-card">
-                    <h4 className="font-medium mb-3">Análise Competitiva</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Concorrentes mapeados:</span>
-                        <span className="font-medium">{formData.concorrentes.length}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Preço médio mercado:</span>
-                        <span className="font-medium">
-                          R$ {formData.concorrentes.length > 0 ? 
-                            (formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.preco) || 0), 0) / formData.concorrentes.length).toLocaleString('pt-BR') : 
-                            '0'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                <div class="input-group">
+                  <label class="text-sm">Faixa 3 (R$ 4.400-8.000)</label>
+                  <input
+                    type="number"
+                    value="${formData.familiasFaixa3}"
+                    onchange="updateFormData('familiasFaixa3', this.value)"
+                    placeholder="Nº famílias"
+                    min="0"
+                  />
                 </div>
-                
-                <div className="result-highlight">
-                  <h4 className="font-bold">🎯 Recomendação de Preço</h4>
-                  <div className="result-grid">
-                    <div className="result-item">
-                      <div className="result-item-label">Preço Mínimo</div>
-                      <div className="result-item-value">R$ {results.precoMinimo.toLocaleString('pt-BR')}</div>
-                      <div className="result-item-label">Limite para viabilidade</div>
-                    </div>
-                    <div className="result-item">
-                      <div className="result-item-label">Preço Sugerido</div>
-                      <div className="result-item-value">R$ {results.precoSugerido.toLocaleString('pt-BR')}</div>
-                      <div className="result-item-label">Baseado na estratégia</div>
-                    </div>
-                    <div className="result-item">
-                      <div className="result-item-label">Margem Final</div>
-                      <div className="result-item-value">{results.margemFinal}%</div>
-                      <div className="result-item-label">Lucro líquido estimado</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid-2">
-                  <div className="validation-box blue">
-                    <h4 className="font-medium mb-3">📈 Projeção de Performance</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>VSO Projetada:</span>
-                        <span className="font-medium">{results.vsoProjetada}% ao mês</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Tempo de vendas (100 un):</span>
-                        <span className="font-medium">{(100 / results.vsoProjetada).toFixed(0)} meses</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Status VSO:</span>
-                        <span className={`font-medium ${results.vsoProjetada >= 2.5 ? 'text-green-600' : 'text-red-600'}`}>
-                          {results.vsoProjetada >= 3 ? 'Excelente' : results.vsoProjetada >= 2.5 ? 'Boa' : 'Baixa'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="validation-box yellow">
-                    <h4 className="font-medium mb-3">⚠️ Validações Críticas</h4>
-                    <div className="space-y-1 text-sm">
-                      <div className={`flex items-center ${results.som >= 50 ? 'text-green-600' : 'text-red-600'}`}>
-                        {results.som >= 50 ? <CheckCircle className="icon mr-2" /> : <AlertTriangle className="icon mr-2" />}
-                        <span>SOM vs Demanda {results.som >= 50 ? '✓' : '✗'}</span>
-                      </div>
-                      <div className={`flex items-center ${results.margemFinal >= 20 ? 'text-green-600' : 'text-red-600'}`}>
-                        {results.margemFinal >= 20 ? <CheckCircle className="icon mr-2" /> : <AlertTriangle className="icon mr-2" />}
-                        <span>Margem Mínima {results.margemFinal >= 20 ? '✓' : '✗'}</span>
-                      </div>
-                      <div className={`flex items-center ${results.vsoProjetada >= 2 ? 'text-green-600' : 'text-red-600'}`}>
-                        {results.vsoProjetada >= 2 ? <CheckCircle className="icon mr-2" /> : <AlertTriangle className="icon mr-2" />}
-                        <span>VSO Viável {results.vsoProjetada >= 2 ? '✓' : '✗'}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="validation-box">
-                  <h4 className="font-medium mb-3">🎯 Próximos Passos</h4>
-                  <div className="grid-2">
-                    <div>
-                      <h5 className="font-medium mb-2">Implementação:</h5>
-                      <ul className="space-y-1">
-                        <li>• Validar preço com equipe comercial</li>
-                        <li>• Testar em pré-lançamento limitado</li>
-                        <li>• Preparar argumentação de vendas</li>
-                        <li>• Definir estratégia de lançamento</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h5 className="font-medium mb-2">Monitoramento:</h5>
-                      <ul className="space-y-1">
-                        <li>• Acompanhar VSO semanal</li>
-                        <li>• Monitorar concorrência</li>
-                        <li>• Avaliar ajustes trimestrais</li>
-                        <li>• Medir satisfação dos clientes</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="validation-box green">
-                  <div className="flex-center">
-                    <CheckCircle className="icon" />
-                    <div>
-                      <h4 className="font-medium">Análise Concluída!</h4>
-                      <p className="text-sm mt-1">
-                        Seu framework de precificação está completo. Use as recomendações como base para a decisão final, 
-                        sempre considerando fatores específicos do seu projeto e mercado local.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-            
-          default:
-            return <div>Etapa não encontrada</div>;
-        }
-      };
-
-      return (
-        <div className="container">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="header">
-              <h1>Framework Interativo de Precificação MCMV</h1>
-              <p>Guia completo para definir o preço ideal do seu empreendimento</p>
-            </div>
-            
-            <div className="progress-container">
-              <div className="progress-info">
-                <span className="font-medium">Etapa {currentStep + 1} de {steps.length}</span>
-                <span>{Math.round(((currentStep + 1) / steps.length) * 100)}% completo</span>
-              </div>
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill"
-                  style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                ></div>
               </div>
             </div>
             
-            <div className="steps-navigation">
-              {steps.map((step, index) => {
-                const Icon = step.icon;
-                let buttonClass = "step-button";
-                
-                if (currentStep === index) {
-                  buttonClass += " active";
-                } else if (currentStep > index) {
-                  buttonClass += " completed";
-                } else {
-                  buttonClass += " inactive";
-                }
-                
-                return (
-                  <button
-                    key={step.id}
-                    onClick={() => setCurrentStep(index)}
-                    className={buttonClass}
-                  >
-                    <Icon className="icon" />
-                    <span>{step.title}</span>
-                    {currentStep > index && <CheckCircle className="icon" />}
-                  </button>
-                );
-              })}
+            ${formData.populacaoTotal ? `
+              <div class="info-box green">
+                <h4 class="font-medium mb-2">Indicadores Calculados</h4>
+                <div class="grid-2">
+                  <div>
+                    <span>Número estimado de famílias:</span>
+                    <span class="font-medium ml-2">${Math.round(parseFloat(formData.populacaoTotal) / 3.2).toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span>SOM estimado (24 meses):</span>
+                    <span class="font-medium ml-2 text-green">${results.som} unidades</span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+      
+      function renderCompetitiva() {
+        return `
+          <div class="space-y-6">
+            <div class="info-box yellow">
+              <div class="flex-center">
+                <i class="fas fa-info-circle icon"></i>
+                <div>
+                  <h4 class="font-medium">Análise Competitiva</h4>
+                  <p class="text-sm">Mapeie empreendimentos similares lançados nos últimos 2 anos</p>
+                </div>
+              </div>
             </div>
             
-            <div className="content-container">
-              <div className="step-header">
-                <h2>{steps[currentStep].title}</h2>
-                <p>{steps[currentStep].description}</p>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-medium">Concorrentes Mapeados</h3>
+              <button onclick="addConcorrente()" class="button primary">
+                + Adicionar Concorrente
+              </button>
+            </div>
+            
+            <div class="space-y-4">
+              ${formData.concorrentes.length > 0 ? 
+                formData.concorrentes.map((concorrente, index) => `
+                  <div class="competitor-card">
+                    <div class="competitor-header">
+                      <h4>Concorrente ${index + 1}</h4>
+                      <button onclick="removeConcorrente(${index})" class="text-red">
+                        Remover
+                      </button>
+                    </div>
+                    
+                    <div class="grid-3">
+                      <div class="input-group">
+                        <label class="text-sm font-medium">Nome do Empreendimento</label>
+                        <input
+                          type="text"
+                          value="${concorrente.nome}"
+                          onchange="updateConcorrente(${index}, 'nome', this.value)"
+                          placeholder="Ex: Residencial Aurora"
+                        />
+                      </div>
+                      
+                      <div class="input-group">
+                        <label class="text-sm font-medium">Preço (R$)</label>
+                        <input
+                          type="number"
+                          value="${concorrente.preco}"
+                          onchange="updateConcorrente(${index}, 'preco', this.value)"
+                          placeholder="Ex: 190000"
+                          min="0"
+                        />
+                      </div>
+                      
+                      <div class="input-group">
+                        <label class="text-sm font-medium">Metragem (m²)</label>
+                        <input
+                          type="number"
+                          value="${concorrente.metragem}"
+                          onchange="updateConcorrente(${index}, 'metragem', this.value)"
+                          placeholder="Ex: 45"
+                          min="0"
+                        />
+                      </div>
+                      
+                      <div class="input-group">
+                        <label class="text-sm font-medium">Localização</label>
+                        <input
+                          type="text"
+                          value="${concorrente.localizacao}"
+                          onchange="updateConcorrente(${index}, 'localizacao', this.value)"
+                          placeholder="Ex: Bairro Centro"
+                        />
+                      </div>
+                      
+                      <div class="input-group">
+                        <label class="text-sm font-medium">Principal Diferencial</label>
+                        <input
+                          type="text"
+                          value="${concorrente.diferencial}"
+                          onchange="updateConcorrente(${index}, 'diferencial', this.value)"
+                          placeholder="Ex: Academia, Piscina"
+                        />
+                      </div>
+                      
+                      <div class="input-group">
+                        <label class="text-sm font-medium">VSO (un/mês)</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value="${concorrente.vso}"
+                          onchange="updateConcorrente(${index}, 'vso', this.value)"
+                          placeholder="Ex: 25"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                `).join('') : `
+                  <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-chart-line fa-3x mb-3 opacity-50"></i>
+                    <p>Adicione concorrentes para análise comparativa</p>
+                  </div>
+                `}
+            </div>
+            
+            ${formData.concorrentes.length > 0 ? `
+              <div class="info-box blue">
+                <h4 class="font-medium mb-2">Resumo Competitivo</h4>
+                <div class="grid-3">
+                  <div>
+                    <span>Preço médio:</span>
+                    <span class="font-medium ml-2">
+                      R$ ${(formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.preco) || 0), 0) / formData.concorrentes.length).toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                  <div>
+                    <span>Metragem média:</span>
+                    <span class="font-medium ml-2">
+                      ${(formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.metragem) || 0), 0) / formData.concorrentes.length).toFixed(0)}m²
+                    </span>
+                  </div>
+                  <div>
+                    <span>VSO médio:</span>
+                    <span class="font-medium ml-2">
+                      ${(formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.vso) || 0), 0) / formData.concorrentes.length).toFixed(1)} un/mês
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+      
+      function renderFinanceira() {
+        return `
+          <div class="space-y-6">
+            <div class="info-box green">
+              <div class="flex-center">
+                <i class="fas fa-info-circle icon"></i>
+                <div>
+                  <h4 class="font-medium">Estrutura de Custos</h4>
+                  <p class="text-sm">Calcule todos os custos para definir o preço mínimo viável</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="grid-2">
+              <div class="input-group">
+                <label>Custo do Terreno (R$/m² construído)</label>
+                <input
+                  type="number"
+                  value="${formData.custoTerreno}"
+                  onchange="updateFormData('custoTerreno', this.value)"
+                  placeholder="Ex: 250"
+                  min="0"
+                />
+                <p class="text-xs text-gray-500 mt-1">Incluir custo de oportunidade e despesas cartoriais</p>
               </div>
               
-              {renderStep()}
+              <div class="input-group">
+                <label>Custo de Construção (R$/m²)</label>
+                <input
+                  type="number"
+                  value="${formData.custoConstrucao}"
+                  onchange="updateFormData('custoConstrucao', this.value)"
+                  placeholder="Ex: 1200"
+                  min="0"
+                />
+                <p class="text-xs text-gray-500 mt-1">CUB + margem de segurança de obras</p>
+              </div>
+              
+              <div class="input-group">
+                <label>Custos Indiretos (R$/m²)</label>
+                <input
+                  type="number"
+                  value="${formData.custosIndiretos}"
+                  onchange="updateFormData('custosIndiretos', this.value)"
+                  placeholder="Ex: 200"
+                  min="0"
+                />
+                <p class="text-xs text-gray-500 mt-1">Projetos, aprovações, marketing, vendas, administração</p>
+              </div>
+              
+              <div class="input-group">
+                <label>Margem Desejada (%)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value="${formData.margemDesejada}"
+                  onchange="updateFormData('margemDesejada', this.value)"
+                  placeholder="Ex: 25"
+                  min="0"
+                />
+                <p class="text-xs text-gray-500 mt-1">Margem líquida após impostos e financeiro</p>
+              </div>
             </div>
             
-            <div className="navigation">
-              <button
-                onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-                disabled={currentStep === 0}
-                className="button flex-center"
-              >
-                <ChevronLeft className="icon" />
-                <span>Anterior</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
-                disabled={currentStep === steps.length - 1}
-                className="button primary flex-center"
-              >
-                <span>Próximo</span>
-                <ChevronRight className="icon" />
-              </button>
+            ${formData.custoTerreno && formData.custoConstrucao ? `
+              <div class="summary-box">
+                <h4 class="font-medium mb-3">Análise de Custos</h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span>Custo Total Direto:</span>
+                    <span class="font-medium">
+                      R$ ${((parseFloat(formData.custoTerreno) || 0) + 
+                           (parseFloat(formData.custoConstrucao) || 0) + 
+                           (parseFloat(formData.custosIndiretos) || 0)).toLocaleString('pt-BR')}/m²
+                    </span>
+                  </div>
+                  <div class="flex justify-between text-red">
+                    <span>Preço Mínimo (com margem):</span>
+                    <span class="font-medium">R$ ${results.precoMinimo.toLocaleString('pt-BR')}/m²</span>
+                  </div>
+                  <div class="flex justify-between text-yellow">
+                    <span>Margem de Segurança:</span>
+                    <span class="font-medium">10% sobre margem desejada</span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            <div class="info-box yellow">
+              <h4 class="font-medium mb-2">⚠️ Pontos de Atenção</h4>
+              <ul class="text-sm space-y-1">
+                <li>• Considere variação do CUB durante a obra (+5-10%)</li>
+                <li>• Reserve capital de giro para 6-12 meses</li>
+                <li>• Avalie impacto de distratos na margem final</li>
+                <li>• Custos financeiros do cronograma de recebimento</li>
+              </ul>
             </div>
           </div>
-        </div>
-      );
-    };
-
-    ReactDOM.render(<MCMVPricingFramework />, document.getElementById('root'));
+        `;
+      }
+      
+      function renderPesquisa() {
+        return `
+          <div class="space-y-6">
+            <div class="info-box purple">
+              <div class="flex-center">
+                <i class="fas fa-info-circle icon"></i>
+                <div>
+                  <h4 class="font-medium">Pesquisa de Intenção de Compra</h4>
+                  <p class="text-sm">Valide a sensibilidade ao preço do público-alvo</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="info-box blue">
+              <h4 class="font-medium mb-2">📋 Como Conduzir a Pesquisa</h4>
+              <div class="text-sm space-y-2">
+                <p><strong>Pergunta-chave:</strong> "Para uma família com renda de R$ X, qual seria o valor máximo que pagaria por um apartamento de XXm² no bairro Y, considerando financiamento MCMV?"</p>
+                <p><strong>Canais sugeridos:</strong> Stands de vendas, redes sociais, pesquisa telefônica, eventos imobiliários</p>
+                <p><strong>Amostra mínima:</strong> 200+ pessoas da faixa de renda MCMV</p>
+              </div>
+            </div>
+            
+            <div class="grid-3">
+              <div class="input-group">
+                <label>Preço Ideal (R$)</label>
+                <input
+                  type="number"
+                  value="${formData.precoIdeal}"
+                  onchange="updateFormData('precoIdeal', this.value)"
+                  placeholder="Ex: 180000"
+                  min="0"
+                />
+                <p class="text-xs text-gray-500 mt-1">Preço mais citado na pesquisa</p>
+              </div>
+              
+              <div class="input-group">
+                <label>Preço Máximo Aceitável (R$)</label>
+                <input
+                  type="number"
+                  value="${formData.precoMaximo}"
+                  onchange="updateFormData('precoMaximo', this.value)"
+                  placeholder="Ex: 220000"
+                  min="0"
+                />
+                <p class="text-xs text-gray-500 mt-1">Limite superior de aceitação</p>
+              </div>
+              
+              <div class="input-group">
+                <label>Preço Suspeito (R$)</label>
+                <input
+                  type="number"
+                  value="${formData.precoSuspeito}"
+                  onchange="updateFormData('precoSuspeito', this.value)"
+                  placeholder="Ex: 150000"
+                  min="0"
+                />
+                <p class="text-xs text-gray-500 mt-1">Preço considerado "muito barato"</p>
+              </div>
+            </div>
+            
+            ${formData.precoIdeal && formData.precoMaximo ? `
+              <div class="info-box green">
+                <h4 class="font-medium mb-2">Análise de Sensibilidade</h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span>Faixa de Preço Aceitável:</span>
+                    <span class="font-medium">
+                      R$ ${parseFloat(formData.precoIdeal).toLocaleString('pt-BR')} - R$ ${parseFloat(formData.precoMaximo).toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Elasticidade Estimada:</span>
+                    <span class="font-medium">
+                      ${(((parseFloat(formData.precoMaximo) - parseFloat(formData.precoIdeal)) / parseFloat(formData.precoIdeal) * 100).toFixed(1)}% de variação
+                    </span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Sweet Spot Recomendado:</span>
+                    <span class="font-medium text-green">
+                      R$ ${((parseFloat(formData.precoIdeal) + parseFloat(formData.precoMaximo)) / 2).toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            <div class="info-box orange">
+              <h4 class="font-medium mb-2">🎯 Dicas para Validação</h4>
+              <ul class="text-sm space-y-1">
+                <li>• Compare resultados com análise competitiva</li>
+                <li>• Teste diferentes perfis de renda na mesma pesquisa</li>
+                <li>• Valide diferencial de preço por localização</li>
+                <li>• Considere sazonalidade na pesquisa (evitar dezembro/janeiro)</li>
+              </ul>
+            </div>
+          </div>
+        `;
+      }
+      
+      function renderEstrategia() {
+        return `
+          <div class="space-y-6">
+            <div class="info-box purple">
+              <div class="flex-center">
+                <i class="fas fa-info-circle icon"></i>
+                <div>
+                  <h4 class="font-medium">Estratégia de Precificação</h4>
+                  <p class="text-sm">Escolha a abordagem mais adequada para seu projeto</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="strategy-option" onclick="updateFormData('estrategia', 'valor')">
+                <label class="flex items-start">
+                  <input
+                    type="radio"
+                    name="estrategia"
+                    value="valor"
+                    ${formData.estrategia === 'valor' ? 'checked' : ''}
+                  />
+                  <div class="strategy-option-content green">
+                    <h4>Precificação por Valor</h4>
+                    <p>Preço baseado no valor percebido pelos clientes. Ideal quando você tem diferenciais únicos e superiores à concorrência.</p>
+                    <div class="text-green">
+                      <strong>Quando usar:</strong> Localização premium, acabamentos superiores, infraestrutura diferenciada
+                    </div>
+                  </div>
+                </label>
+              </div>
+              
+              <div class="strategy-option" onclick="updateFormData('estrategia', 'competitiva')">
+                <label class="flex items-start">
+                  <input
+                    type="radio"
+                    name="estrategia"
+                    value="competitiva"
+                    ${formData.estrategia === 'competitiva' ? 'checked' : ''}
+                  />
+                  <div class="strategy-option-content blue">
+                    <h4>Precificação Competitiva</h4>
+                    <p>Preço similar ao mercado, competindo em outros fatores como prazo de entrega, facilidade de aprovação ou atendimento.</p>
+                    <div class="text-blue">
+                      <strong>Quando usar:</strong> Mercado estabelecido, produto similar aos concorrentes, foco na execução
+                    </div>
+                  </div>
+                </label>
+              </div>
+              
+              <div class="strategy-option" onclick="updateFormData('estrategia', 'penetracao')">
+                <label class="flex items-start">
+                  <input
+                    type="radio"
+                    name="estrategia"
+                    value="penetracao"
+                    ${formData.estrategia === 'penetracao' ? 'checked' : ''}
+                  />
+                  <div class="strategy-option-content orange">
+                    <h4>Precificação de Penetração</h4>
+                    <p>Preço abaixo do mercado para ganhar participação rapidamente. Estratégia de volume com margem reduzida.</p>
+                    <div class="text-orange">
+                      <strong>Quando usar:</strong> Entrada em novo mercado, necessidade de VSO alta, concorrência forte
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label>Meta de VSO (% estoque/mês)</label>
+              <input
+                type="number"
+                step="0.1"
+                value="${formData.vsoMeta}"
+                onchange="updateFormData('vsoMeta', this.value)"
+                placeholder="Ex: 2.5"
+                min="0"
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                Referência: Mercado normal 2-3%, aquecido 3-5%, fraco 1-2%
+              </p>
+            </div>
+            
+            ${formData.estrategia ? `
+              <div class="summary-box">
+                <h4 class="font-medium mb-2">Impactos da Estratégia Escolhida</h4>
+                <div class="text-sm space-y-1">
+                  ${formData.estrategia === 'valor' ? `
+                    <p class="text-green">✓ Maior margem de lucro</p>
+                    <p class="text-green">✓ Posicionamento premium</p>
+                    <p class="text-red">⚠ VSO mais baixa</p>
+                    <p class="text-red">⚠ Risco de estoque parado</p>
+                  ` : ''}
+                  ${formData.estrategia === 'competitiva' ? `
+                    <p class="text-blue">✓ Risco equilibrado</p>
+                    <p class="text-blue">✓ VSO previsível</p>
+                    <p class="text-yellow">⚠ Margem média</p>
+                    <p class="text-yellow">⚠ Dependente da execução</p>
+                  ` : ''}
+                  ${formData.estrategia === 'penetracao' ? `
+                    <p class="text-orange">✓ VSO alta</p>
+                    <p class="text-orange">✓ Rápida penetração</p>
+                    <p class="text-red">⚠ Margem reduzida</p>
+                    <p class="text-red">⚠ Pode prejudicar brand</p>
+                  ` : ''}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+      
+      function renderResultados() {
+        return `
+          <div class="space-y-6">
+            <div class="result-highlight">
+              <h4 class="font-bold">📊 Análise Final e Recomendações</h4>
+            </div>
+            
+            <div class="grid-2">
+              <div class="result-card">
+                <h4 class="font-medium mb-3">Indicadores de Demanda</h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span>SOM (24 meses):</span>
+                    <span class="font-medium">${results.som} unidades</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Famílias elegíveis:</span>
+                    <span class="font-medium">
+                      ${((parseFloat(formData.familiasFaixa1) || 0) + 
+                        (parseFloat(formData.familiasFaixa2) || 0) + 
+                        (parseFloat(formData.familiasFaixa3) || 0)).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="result-card">
+                <h4 class="font-medium mb-3">Análise Competitiva</h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span>Concorrentes mapeados:</span>
+                    <span class="font-medium">${formData.concorrentes.length}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Preço médio mercado:</span>
+                    <span class="font-medium">
+                      R$ ${formData.concorrentes.length > 0 ? 
+                        (formData.concorrentes.reduce((acc, comp) => acc + (parseFloat(comp.preco) || 0), 0) / formData.concorrentes.length).toLocaleString('pt-BR') : 
+                        '0'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="result-highlight">
+              <h4 class="font-bold">🎯 Recomendação de Preço</h4>
+              <div class="result-grid">
+                <div class="result-item">
+                  <div class="result-item-label">Preço Mínimo</div>
+                  <div class="result-item-value">R$ ${results.precoMinimo.toLocaleString('pt-BR')}</div>
+                  <div class="result-item-label">Limite para viabilidade</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">Preço Sugerido</div>
+                  <div class="result-item-value">R$ ${results.precoSugerido.toLocaleString('pt-BR')}</div>
+                  <div class="result-item-label">Baseado na estratégia</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">Margem Final</div>
+                  <div class="result-item-value">${results.margemFinal}%</div>
+                  <div class="result-item-label">Lucro líquido estimado</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="grid-2">
+              <div class="validation-box blue">
+                <h4 class="font-medium mb-3">📈 Projeção de Performance</h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span>VSO Projetada:</span>
+                    <span class="font-medium">${results.vsoProjetada}% ao mês</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Tempo de vendas (100 un):</span>
+                    <span class="font-medium">${(100 / results.vsoProjetada).toFixed(0)} meses</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Status VSO:</span>
+                    <span class="font-medium ${results.vsoProjetada >= 2.5 ? 'text-green' : 'text-red'}">
+                      ${results.vsoProjetada >= 3 ? 'Excelente' : results.vsoProjetada >= 2.5 ? 'Boa' : 'Baixa'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="validation-box yellow">
+                <h4 class="font-medium mb-3">⚠️ Validações Críticas</h4>
+                <div class="space-y-1 text-sm">
+                  <div class="flex items-center ${results.som >= 50 ? 'text-green' : 'text-red'}">
+                    <i class="fas ${results.som >= 50 ? 'fa-check-circle' : 'fa-exclamation-triangle'} icon mr-2"></i>
+                    <span>SOM vs Demanda ${results.som >= 50 ? '✓' : '✗'}</span>
+                  </div>
+                  <div class="flex items-center ${results.margemFinal >= 20 ? 'text-green' : 'text-red'}">
+                    <i class="fas ${results.margemFinal >= 20 ? 'fa-check-circle' : 'fa-exclamation-triangle'} icon mr-2"></i>
+                    <span>Margem Mínima ${results.margemFinal >= 20 ? '✓' : '✗'}</span>
+                  </div>
+                  <div class="flex items-center ${results.vsoProjetada >= 2 ? 'text-green' : 'text-red'}">
+                    <i class="fas ${results.vsoProjetada >= 2 ? 'fa-check-circle' : 'fa-exclamation-triangle'} icon mr-2"></i>
+                    <span>VSO Viável ${results.vsoProjetada >= 2 ? '✓' : '✗'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="validation-box">
+              <h4 class="font-medium mb-3">🎯 Próximos Passos</h4>
+              <div class="grid-2">
+                <div>
+                  <h5 class="font-medium mb-2">Implementação:</h5>
+                  <ul class="space-y-1">
+                    <li>• Validar preço com equipe comercial</li>
+                    <li>• Testar em pré-lançamento limitado</li>
+                    <li>• Preparar argumentação de vendas</li>
+                    <li>• Definir estratégia de lançamento</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 class="font-medium mb-2">Monitoramento:</h5>
+                  <ul class="space-y-1">
+                    <li>• Acompanhar VSO semanal</li>
+                    <li>• Monitorar concorrência</li>
+                    <li>• Avaliar ajustes trimestrais</li>
+                    <li>• Medir satisfação dos clientes</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div class="validation-box green">
+              <div class="flex-center">
+                <i class="fas fa-check-circle icon"></i>
+                <div>
+                  <h4 class="font-medium">Análise Concluída!</h4>
+                  <p class="text-sm mt-1">
+                    Seu framework de precificação está completo. Use as recomendações como base para a decisão final, 
+                    sempre considerando fatores específicos do seu projeto e mercado local.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      function render() {
+        const app = document.getElementById('app');
+        if (!app) return;
+        
+        calculateResults();
+        
+        app.innerHTML = `
+          <div class="container">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div class="header">
+                <h1>Framework Interativo de Precificação MCMV</h1>
+                <p>Guia completo para definir o preço ideal do seu empreendimento</p>
+              </div>
+              
+              <div class="progress-container">
+                <div class="progress-info">
+                  <span class="font-medium">Etapa ${currentStep + 1} de ${steps.length}</span>
+                  <span>${Math.round(((currentStep + 1) / steps.length) * 100)}% completo</span>
+                </div>
+                <div class="progress-bar">
+                  <div 
+                    class="progress-fill"
+                    style="width: ${((currentStep + 1) / steps.length) * 100}%"
+                  ></div>
+                </div>
+              </div>
+              
+              <div class="steps-navigation">
+                ${steps.map((step, index) => {
+                  let buttonClass = "step-button";
+                  
+                  if (currentStep === index) {
+                    buttonClass += " active";
+                  } else if (currentStep > index) {
+                    buttonClass += " completed";
+                  }
+                  
+                  return `
+                    <button
+                      onclick="currentStep = ${index}; render()"
+                      class="${buttonClass}"
+                    >
+                      <i class="fas fa-${step.icon}"></i>
+                      <span>${step.title}</span>
+                      ${currentStep > index ? '<i class="fas fa-check"></i>' : ''}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+              
+              <div class="content-container">
+                <div class="step-header">
+                  <h2>${steps[currentStep].title}</h2>
+                  <p>${steps[currentStep].description}</p>
+                </div>
+                
+                ${renderStep()}
+              </div>
+              
+              <div class="navigation">
+                <button
+                  onclick="currentStep = Math.max(0, currentStep - 1); render()"
+                  ${currentStep === 0 ? 'disabled' : ''}
+                  class="button ${currentStep === 0 ? 'disabled' : ''}"
+                >
+                  <i class="fas fa-chevron-left"></i>
+                  <span>Anterior</span>
+                </button>
+                
+                <button
+                  onclick="currentStep = Math.min(${steps.length - 1}, currentStep + 1); render()"
+                  ${currentStep === steps.length - 1 ? 'disabled' : ''}
+                  class="button primary ${currentStep === steps.length - 1 ? 'disabled' : ''}"
+                >
+                  <span>Próximo</span>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Inicializa a aplicação
+      render();
+      
+      // Torna as funções globais para os event handlers
+      window.updateFormData = updateFormData;
+      window.addConcorrente = addConcorrente;
+      window.updateConcorrente = updateConcorrente;
+      window.removeConcorrente = removeConcorrente;
+      window.currentStep = currentStep;
+    });
   </script>
 </body>
 </html>
